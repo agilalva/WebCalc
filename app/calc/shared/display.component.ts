@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
+import { CalcService } from './calc.service';
+
 @Component({
     moduleId: module.id,
     selector: 'calc-display',
@@ -10,9 +12,14 @@ import { Component, Input, OnInit } from '@angular/core';
     `
 })
 export class DisplayComponent implements OnInit {
-    @Input() displayText: string = "0";
+    private displayText: string;
 
-    constructor() { }
+    constructor(private calcService: CalcService) { }
 
-    ngOnInit() { }
+    ngOnInit() {
+        // Waiting for changes
+        this.calcService.result$.subscribe(value => {
+            this.displayText = value;
+        });
+    }
 }

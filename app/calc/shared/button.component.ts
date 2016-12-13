@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 import { CalcService } from './../shared/calc.service';
 
@@ -7,12 +7,10 @@ import { CalcService } from './../shared/calc.service';
     selector: 'calc-button',
     template: '<button (click)="onButtonClick()">{{text}}</button>'
 })
-export class ButtonComponent implements OnInit {
+export class ButtonComponent {
     @Input() text: string;
 
     constructor(private calcService: CalcService) { }
-
-    ngOnInit() { }
 
     onButtonClick() {
         this.calcService.process(this.text);
