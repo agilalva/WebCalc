@@ -4,4 +4,8 @@ import { Injectable } from '@angular/core';
 export class CalcService {
 
     constructor() { }
+
+    process(action: string) {
+        console.log(action);
+    }
 }

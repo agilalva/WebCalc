@@ -5,7 +5,7 @@ import { CalcService } from './../shared/calc.service';
 @Component({
     moduleId: module.id,
     selector: 'calc-button',
-    templateUrl: 'button.component.html'
+    template: '<button (click)="onButtonClick()">{{text}}</button>'
 })
 export class ButtonComponent implements OnInit {
     @Input() text: string;
@@ -15,5 +15,6 @@ export class ButtonComponent implements OnInit {
     ngOnInit() { }
 
     onButtonClick() {
+        this.calcService.process(this.text);
     }
 }

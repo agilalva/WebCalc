@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 
-import { ButtonComponent } from './button/button.component';
+import { ButtonComponent } from './shared/button.component';
 import { CalcComponent } from './calc.component';
-import { DisplayComponent } from './display/display.component';
+import { DisplayComponent } from './shared/display.component';
 
 import { CalcService } from './shared/calc.service';
 
