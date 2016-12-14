@@ -1,23 +1,26 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class CalcService {
 
-    private actionsList: [{ action: string, func: (a?: string) => void }] = [
-        { action: "CE", func: this.clearEntry },
-        { action: "C", func: this.clear },
-        { action: "Del", func: this.delete },
-        { action: "/", func: this.divide },
-        { action: "*", func: this.multiply },
-        { action: "-", func: this.substract },
-        { action: "+", func: this.add },
-        { action: "=", func: this.equals },
-        { action: ".", func: this.dot },
-        { action: "+/-", func: this.sign }
+    private actionsList: [{ action: string, exec: boolean, func: () => void }] = [
+        { action: "CE", exec: true, func: () => this.clearEntry() },
+        { action: "C", exec: true, func: () => this.clear() },
+        { action: "Del", exec: true, func: () => this.delete() },
+        { action: "/", exec: false, func: () => this.calcStorage /= this.currentValue },
+        { action: "*", exec: false, func: () => this.calcStorage *= this.currentValue },
+        { action: "-", exec: false, func: () => this.calcStorage -= this.currentValue },
+        { action: "+", exec: false, func: () => this.calcStorage += this.currentValue },
+        { action: "=", exec: true, func: () => this.equals() },
+        { action: ".", exec: true, func: () => this.dot() },
+        { action: "+/-", exec: true, func: () => this.sign() }
     ]
 
-    private resultSource = new BehaviorSubject<string>("0");
+    private calcStorage: number = 0;
+    private currentValue: number = 0;
+    private resultSource = new Subject<string>();
+    private selectedAction: any;
 
     constructor() { }
 
@@ -28,22 +31,34 @@ export class CalcService {
     process(action: string) {
         let actionAvailable = this.actionsList.find((obj) => obj.action === action);
         if (actionAvailable) {
-            actionAvailable.func(action);
-        } else {
+            if (actionAvailable.exec) {
+                actionAvailable.func();
+            } else if (this.selectedAction) {
+                this.equals();
+                this.selectedAction = actionAvailable.func;
+            } else {
+                if (this.calcStorage == 0) {
+                    this.calcStorage = this.currentValue;
+                }
+                this.currentValue = 0;
+                this.selectedAction = actionAvailable.func;
+            }
+        }
+        else {
             this.display(action);
         }
     }
 
-    add() {
-        console.log("added!");
-    }
-
     clear() {
-        console.log("cleared!");
+        this.currentValue = 0;
+        this.calcStorage = 0;
+        this.selectedAction = null;
+        this.resultSource.next("0");
     }
 
     clearEntry() {
-        console.log("entry cleared!");
+        this.currentValue = 0;
+        this.resultSource.next("0");
     }
 
     delete() {
@@ -51,13 +66,9 @@ export class CalcService {
     }
 
     display(value: string) {
-        let oldValue = this.resultSource.getValue();
-        let newValue = Number(oldValue + value);
-        this.resultSource.next(newValue.toString());
-    }
-
-    divide() {
-        console.log("divided!");
+        let newValue = Number(this.currentValue + value);
+        this.currentValue = newValue;
+        this.resultSource.next(this.currentValue.toString());
     }
 
     dot() {
@@ -65,18 +76,13 @@ export class CalcService {
     }
 
     equals() {
-        console.log("equaled!");
-    }
-
-    multiply() {
-        console.log("multiplied!");
+        this.selectedAction();
+        this.currentValue = 0;
+        this.selectedAction = null;
+        this.resultSource.next(this.calcStorage.toString());
     }
 
     sign() {
         console.log("sign changed!");
-    }
-
-    substract() {
-        console.log("substracted!");
     }
 }
