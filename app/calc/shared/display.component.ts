@@ -17,8 +17,6 @@ export class DisplayComponent implements OnInit {
     constructor(private calcService: CalcService) { }
 
     ngOnInit() {
-        // Initialization
-        this.displayText = "0";
         // Waiting for changes
         this.calcService.result$.subscribe(value => {
             this.displayText = value;
